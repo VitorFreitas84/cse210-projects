@@ -1,136 +1,113 @@
-// Program.cs
-using System;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-class Program
+public class ScriptureWord
 {
-    static void Main()
-    {
-        // Create an instance of the ScriptureManager class
-        ScriptureManager scriptureManager = new ScriptureManager();
+    public string Word { get; set; }
+    public bool IsHidden { get; set; }
 
-        // Start the scripture memorization process
-        scriptureManager.StartMemorization();
+    public ScriptureWord(string word)
+    {
+        Word = word;
+        IsHidden = false;
     }
 }
 
-class ScriptureManager
+public class ScriptureReference
 {
-    private Scripture scripture;
+    public string Book { get; }
+    public int Chapter { get; }
+    public int VerseStart { get; }
+    public int VerseEnd { get; }
 
-    public void StartMemorization()
+    public ScriptureReference(string book, int chapter, int verseStart, int verseEnd = 0)
     {
-        // Initialize the scripture with reference and text
-        scripture = new Scripture("John 3:16", "For God so loved the world...");
-
-        // Display the complete scripture
-        Console.WriteLine(scripture.GetFullScripture());
-
-        // Memorization loop
-        while (!scripture.AllWordsHidden)
-        {
-            Console.WriteLine("Press Enter to continue or type 'quit' to exit.");
-            string userInput = Console.ReadLine();
-
-            if (userInput.ToLower() == "quit")
-                break;
-
-            // Hide a few random words and display the updated scripture
-            scripture.HideRandomWords();
-            Console.Clear();
-            Console.WriteLine(scripture.GetHiddenScripture());
-        }
-
-        Console.WriteLine("Memorization complete. Press Enter to exit.");
-        Console.ReadLine();
+        Book = book;
+        Chapter = chapter;
+        VerseStart = verseStart;
+        VerseEnd = verseEnd;
     }
 }
 
-class Scripture
+public class Scripture
 {
-    private ScriptureReference reference;
-    private List<ScriptureWord> words;
+    private readonly List<ScriptureWord> words;
 
-    public bool AllWordsHidden => words.All(word => word.IsHidden);
+    public ScriptureReference Reference { get; }
+    public IReadOnlyList<ScriptureWord> Words => words;
 
-    public Scripture(string referenceText, string scriptureText)
+    public Scripture(ScriptureReference reference, string text)
     {
-        reference = new ScriptureReference(referenceText);
-        words = ParseScriptureText(scriptureText);
+        Reference = reference;
+        words = text.Split(' ').Select(word => new ScriptureWord(word)).ToList();
     }
 
-    public string GetFullScripture()
-    {
-        return $"{reference.GetReference()} {GetScriptureText()}";
-    }
-
-    public string GetHiddenScripture()
-    {
-        return $"{reference.GetReference()} {GetHiddenText()}";
-    }
-
-    public void HideRandomWords()
+    public void HideRandomWords(int count)
     {
         Random random = new Random();
-        int wordsToHide = 3; // Adjust the number of words to hide as needed
 
-        for (int i = 0; i < wordsToHide; i++)
+        for (int i = 0; i < count; i++)
         {
             int index = random.Next(words.Count);
             words[index].IsHidden = true;
         }
     }
 
-    private List<ScriptureWord> ParseScriptureText(string scriptureText)
+    public void Display()
     {
-        string[] wordsArray = scriptureText.Split(' ');
-        return wordsArray.Select(word => new ScriptureWord(word)).ToList();
-    }
+        Console.Clear();
+        Console.WriteLine($"Scripture Reference: {Reference.Book} {Reference.Chapter}:{Reference.VerseStart}-{Reference.VerseEnd}");
 
-    private string GetScriptureText()
-    {
-        return string.Join(" ", words.Select(word => word.ToString()));
-    }
+        foreach (var word in words)
+        {
+            if (word.IsHidden)
+                Console.Write("____ ");
+            else
+                Console.Write($"{word.Word} ");
+        }
 
-    private string GetHiddenText()
-    {
-        return string.Join(" ", words.Where(word => word.IsHidden).Select(word => word.ToString()));
+        Console.WriteLine("\n\nPress Enter to continue or type 'quit' to exit.");
     }
 }
 
-// ScriptureReference.cs
-class ScriptureReference
+class Program
 {
-    private string reference;
-
-    public ScriptureReference(string referenceText)
+    static void Main()
     {
-        reference = referenceText;
-    }
+        // Example usage for John 3:16
+        ScriptureReference john316Reference = new ScriptureReference("John", 3, 16);
+        string john316Text = "For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.";
+        Scripture john316Scripture = new Scripture(john316Reference, john316Text);
 
-    public string GetReference()
-    {
-        return reference;
+        // Example usage for Proverbs 3:5-6
+        ScriptureReference prov35Reference = new ScriptureReference("Proverbs", 3, 5, 6);
+        string prov35Text = "Trust in the Lord with all thine heart; and lean not unto thine own understanding. In all thy ways acknowledge him, and he shall direct thy paths.";
+        Scripture prov35Scripture = new Scripture(prov35Reference, prov35Text);
+
+        while (john316Scripture.Words.Any(word => !word.IsHidden) || prov35Scripture.Words.Any(word => !word.IsHidden))
+        {
+            john316Scripture.Display();
+            string userInput = Console.ReadLine();
+
+            if (userInput.ToLower() == "quit")
+                break;
+
+            john316Scripture.HideRandomWords(2);
+        }
+
+        Console.WriteLine("\n\n---\n\n");
+
+        while (prov35Scripture.Words.Any(word => !word.IsHidden))
+        {
+            prov35Scripture.Display();
+            string userInput = Console.ReadLine();
+
+            if (userInput.ToLower() == "quit")
+                break;
+
+            prov35Scripture.HideRandomWords(2);
+        }
     }
 }
 
-// ScriptureWord.cs
-class ScriptureWord
-{
-    private string word;
-
-    public bool IsHidden { get; set; }
-
-    public ScriptureWord(string word)
-    {
-        this.word = word;
-        IsHidden = false; // You might want to initialize it based on your requirements
-    }
-
-    public override string ToString()
-    {
-        return IsHidden ? "_____" : word;
-    }
-}
