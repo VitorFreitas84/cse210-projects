@@ -42,11 +42,18 @@ class MindfulnessActivity
         Console.WriteLine($"Good job! You completed {activityName} for {durationInSeconds} seconds.");
         Thread.Sleep(2000); // Pause for 2 seconds
     }
-
-    protected virtual void PerformActivity()
+    
+   protected virtual void PerformActivity()
     {
-        // To be implemented by derived classes
+        Console.WriteLine("Generic activity is being performed.");
+        
+         for (int i = 0; i < durationInSeconds; i++)
+         {
+            Console.WriteLine(i % 2 == 0 ? "Breathe in..." : "Breathe out...");
+            Thread.Sleep(1000); // Pause for 1 second
+         }
     }
+
 }
 
 // BreathingActivity class
@@ -133,13 +140,22 @@ class ListingActivity : MindfulnessActivity
 
         int itemsCount = 0;
 
+        // Allow the user to enter items until the duration is reached
         while (durationInSeconds > 0)
         {
             Console.Write("Item: ");
-            Console.ReadLine(); // Assuming the user enters items one by one
+            string item = Console.ReadLine();
 
-            itemsCount++;
-            durationInSeconds--;
+            // Check if the entered item is not empty
+            if (!string.IsNullOrWhiteSpace(item))
+            {
+                itemsCount++;
+                durationInSeconds--;
+            }
+            else
+            {
+                Console.WriteLine("Invalid input. Please enter a valid item.");
+            }
         }
 
         Console.WriteLine($"You listed {itemsCount} items.");
@@ -150,13 +166,14 @@ class Program
 {
     static void Main()
     {
-        // Sample usage
+        // Sample usage of the mindfulness activities
         MindfulnessActivity[] activities = {
             new BreathingActivity(),
             new ReflectionActivity(),
             new ListingActivity()
         };
 
+        // Iterate through each activity and start it
         foreach (var activity in activities)
         {
             activity.StartActivity();
