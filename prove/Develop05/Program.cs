@@ -347,3 +347,6 @@ class ChecklistGoal : Goal
         return null;
     }
 }
+
+
+//Vitor H S Freitas
