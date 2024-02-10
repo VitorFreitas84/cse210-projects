@@ -323,4 +323,27 @@ class ChecklistGoal : Goal
     {
         return $"{_shortName} - {_description} (Completed {_completedCount}/{_target} times)";
     }
+
+    public override string Serialize()
+    {
+        return $"{base.Serialize()},{_target},{_bonus},{_completedCount}";
+    }
+
+    public new static Goal Deserialize(string data)
+    {
+        string[] parts = data.Split(',');
+        if (parts.Length == 6)
+        {
+            string shortName = parts[0];
+            string description = parts[1];
+            int points = int.Parse(parts[2]);
+            int target = int.Parse(parts[3]);
+            int bonus = int.Parse(parts[4]);
+            int completedCount = int.Parse(parts[5]);
+            ChecklistGoal goal = new ChecklistGoal(shortName, description, points, target, bonus);
+            goal._completedCount = completedCount;
+            return goal;
+        }
+        return null;
+    }
 }
