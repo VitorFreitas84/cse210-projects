@@ -1,0 +1,3 @@
+Run a marathon,1000,True
+Read scriptures,100,True
+Attend the temple,50,True
