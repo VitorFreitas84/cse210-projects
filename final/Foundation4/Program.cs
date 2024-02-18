@@ -382,3 +382,6 @@ class Swimming : Activity
         return $"{Date.ToShortDateString()} Swimming ({DurationInMinutes} min): Distance {GetDistance()} km, Speed: {GetSpeed()} kph, Pace: {GetPace()} min per km";
     }
 }
+
+
+//Vitor H S Freitas
