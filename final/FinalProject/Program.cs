@@ -119,4 +119,106 @@ public class Department
             Console.WriteLine($"Name: {employee.Name}, ID: {employee.Id}, Salary: {employee.Salary}");
         }
     }
+
+    public Employee FindEmployeeById(int id)
+    {
+        return employees.Find(e => e.Id == id);
+    }
+}
+
+public class Program
+{
+    static void Main(string[] args)
+    {
+        Department department = new Department("Engineering");
+        bool exit = false;
+
+        while (!exit)
+        {
+            Console.WriteLine("\nMenu:");
+            Console.WriteLine("1. Display Employees");
+            Console.WriteLine("2. Add New Employee");
+            Console.WriteLine("3. Remove Employee");
+            Console.WriteLine("4. Exit");
+            Console.Write("Select an option: ");
+            string choice = Console.ReadLine();
+
+            switch (choice)
+            {
+                case "1":
+                    Console.WriteLine("\nEmployees:");
+                    department.DisplayEmployees();
+                    break;
+                case "2":
+                    AddEmployee(department);
+                    break;
+                case "3":
+                    RemoveEmployee(department);
+                    break;
+                case "4":
+                    exit = true;
+                    break;
+                default:
+                    Console.WriteLine("Invalid option. Please try again.");
+                    break;
+            }
+        }
+    }
+
+    static void AddEmployee(Department department)
+    {
+        Console.Write("\nEnter employee name: ");
+        string name = Console.ReadLine();
+        Console.Write("Enter employee ID: ");
+        int id = int.Parse(Console.ReadLine());
+        Console.Write("Enter employee salary: ");
+        decimal salary = decimal.Parse(Console.ReadLine());
+
+        Console.WriteLine("Select type of employee:");
+        Console.WriteLine("1. Full Time");
+        Console.WriteLine("2. Part Time");
+        Console.Write("Enter choice: ");
+        string employeeTypeChoice = Console.ReadLine();
+
+        switch (employeeTypeChoice)
+        {
+            case "1":
+                Console.Write("Enter employee's annual salary: ");
+                decimal annualSalary = decimal.Parse(Console.ReadLine());
+                department.AddEmployee(new FullTimeEmployee(name, id, salary, annualSalary));
+                Console.WriteLine("Full Time Employee added successfully.");
+                break;
+            case "2":
+                Console.Write("Enter employee's hours worked: ");
+                int hoursWorked = int.Parse(Console.ReadLine());
+                Console.Write("Enter employee's hourly salary: ");
+                decimal hourlySalary = decimal.Parse(Console.ReadLine());
+                department.AddEmployee(new PartTimeEmployee(name, id, salary, hoursWorked, hourlySalary));
+                Console.WriteLine("Part Time Employee added successfully.");
+                break;
+            default:
+                Console.WriteLine("Invalid option.");
+                break;
+        }
+    }
+
+    static void RemoveEmployee(Department department)
+    {
+        department.DisplayEmployees(); // Display employees first
+        Console.Write("\nEnter employee ID to remove: ");
+        int id = int.Parse(Console.ReadLine());
+
+        // Find the employee to remove
+        Employee employeeToRemove = department.FindEmployeeById(id);
+
+        if (employeeToRemove != null)
+        {
+            department.RemoveEmployee(employeeToRemove);
+            Console.WriteLine("Employee removed successfully.");
+        }
+        else
+        {
+            Console.WriteLine("Employee with the given ID not found.");
+        }
+    }
 }
